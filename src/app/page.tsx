@@ -25,8 +25,21 @@ export default function Chat() {
     const currentInput = input;
     setInput("");
     
+    const history = messages.length === 0 
+      ? "（初回なので会話履歴なし）"
+      : messages.map(msg => `${msg.isUser ? 'ユーザー' : 'システム'}: ${msg.text}`).join('\n');
+    
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_URL}?input_text=${encodeURIComponent(currentInput)}`);
+      const response = await fetch(process.env.NEXT_PUBLIC_URL!, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          input_text: currentInput,
+          history: history
+        })
+      });
       const data = await response.json();
       
       const systemMessage: Message = {
